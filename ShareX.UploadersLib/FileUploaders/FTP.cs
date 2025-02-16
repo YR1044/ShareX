@@ -2,7 +2,7 @@
 
 /*
     ShareX - A program that allows you to take screenshots and share any file type
-    Copyright (c) 2007-2022 ShareX Team
+    Copyright (c) 2007-2025 ShareX Team
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -24,6 +24,7 @@
 #endregion License Information (GPL v3)
 
 using FluentFTP;
+using FluentFTP.Exceptions;
 using ShareX.HelpersLib;
 using ShareX.UploadersLib.Properties;
 using System;
@@ -122,11 +123,11 @@ namespace ShareX.UploadersLib.FileUploaders
 
             if (account.IsActive)
             {
-                client.DataConnectionType = FtpDataConnectionType.AutoActive;
+                client.Config.DataConnectionType = FtpDataConnectionType.AutoActive;
             }
             else
             {
-                client.DataConnectionType = FtpDataConnectionType.AutoPassive;
+                client.Config.DataConnectionType = FtpDataConnectionType.AutoPassive;
             }
 
             if (account.Protocol == FTPProtocol.FTPS)
@@ -135,20 +136,20 @@ namespace ShareX.UploadersLib.FileUploaders
                 {
                     default:
                     case FTPSEncryption.Explicit:
-                        client.EncryptionMode = FtpEncryptionMode.Explicit;
+                        client.Config.EncryptionMode = FtpEncryptionMode.Explicit;
                         break;
                     case FTPSEncryption.Implicit:
-                        client.EncryptionMode = FtpEncryptionMode.Implicit;
+                        client.Config.EncryptionMode = FtpEncryptionMode.Implicit;
                         break;
                 }
 
-                client.SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
-                client.DataConnectionEncryption = true;
+                client.Config.SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
+                client.Config.DataConnectionEncryption = true;
 
                 if (!string.IsNullOrEmpty(account.FTPSCertificateLocation) && File.Exists(account.FTPSCertificateLocation))
                 {
                     X509Certificate cert = X509Certificate2.CreateFromSignedFile(Account.FTPSCertificateLocation);
-                    client.ClientCertificates.Add(cert);
+                    client.Config.ClientCertificates.Add(cert);
                 }
                 else
                 {
